@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { code: "72007", name: "Anatomía Humana II y Neuroanatomía", semester: 2, prereqs: ["72004"] },
         { code: "72008", name: "Histología y Embriología", semester: 2, prereqs: ["72002"] },
         { code: "72009", name: "Historia y Filosofía de la Salud", semester: 2, prereqs: ["72000"] },
-        { code: "3638", name: "Inglés I", semester: 2, prereqs: [] },
+        { code: "3637", name: "Inglés I", semester: 2, prereqs: [] },
         // Semestre 3
         { code: "72010", name: "Biomecánica I: Fisiología Articular y Artrokinemática", semester: 3, prereqs: ["72006"] },
         { code: "72011", name: "Ergonomía y Salud Ocupacional", semester: 3, prereqs: ["72009"] },
