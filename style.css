@@ -165,3 +165,9 @@ footer {
     font-size: 0.9em;
     color: #777;
 }
+.love-message {
+    color: #e91e63; /* Un color rosado bonito */
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
