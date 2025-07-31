@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Definición de los datos de la malla curricular
-    // NOTA: Se asignaron códigos a ramos que no lo tenían explícito en el PDF para su identificación.
     const courseData = [
         // Semestre 1
         { code: "72000", name: "Introducción a las Ciencias de la Salud y RHB", semester: 1, prereqs: [] },
@@ -59,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { code: "72042", name: "Técnicas Kinésicas en Traumatología", semester: 8, prereqs: ["72018", "72036"] },
         { code: "72043", name: "Biónica y Mecatrónica", semester: 8, prereqs: ["72038"] },
         { code: "72044", name: "Proyecto de Investigación en Kinesiología", semester: 8, prereqs: ["72035"] },
-        // Semestre 9 y 10
+        // Semestre 9 y 10 (agrupados)
         { code: "72045", name: "Internado de Neurokinesiología", semester: 9, prereqs: ["72039", "72040", "72041", "72042", "72043", "72044"] },
         { code: "75046", name: "Internado de Kinesiología Músculo Esquelética", semester: 9, prereqs: ["72039", "72040", "72041", "72042", "72043", "72044"] },
         { code: "75047", name: "Internado de Kinesiología Cardiorrespiratoria", semester: 9, prereqs: ["72039", "72040", "72041", "72042", "72043", "72044"] },
@@ -67,132 +65,119 @@ document.addEventListener('DOMContentLoaded', function () {
     ];
 
     const gridContainer = document.getElementById('grid-container');
-    const svgContainer = document.getElementById('arrow-container');
     const numSemesters = 10;
+    // Cargar ramos aprobados desde el almacenamiento local o iniciar un array vacío
+    let passedCourses = JSON.parse(localStorage.getItem('passedCourses_kine')) || [];
 
-    // Crear columnas de semestres
-    for (let i = 1; i <= numSemesters; i++) {
-        const semesterColumn = document.createElement('div');
-        semesterColumn.classList.add('semester-column');
-        semesterColumn.id = `semester-${i}`;
-        
-        const semesterTitle = document.createElement('div');
-        const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-        semesterTitle.classList.add('semester-title');
-        // Agrupar 9 y 10
-        if (i === 9) {
-            semesterTitle.textContent = 'SEMESTRE IX y X';
-        } else if (i === 10) {
-            continue; // Saltar la creación de la columna 10
+    function initializeGrid() {
+        // Crear columnas de semestres
+        for (let i = 1; i <= numSemesters; i++) {
+            const semesterColumn = document.createElement('div');
+            semesterColumn.classList.add('semester-column');
+            semesterColumn.id = `semester-${i}`;
+            
+            const semesterTitle = document.createElement('div');
+            const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+            semesterTitle.classList.add('semester-title');
+
+            if (i === 9) {
+                semesterTitle.textContent = 'SEMESTRE IX y X';
+            } else if (i === 10) {
+                 // La columna 10 se agrupa visualmente con la 9
+                continue;
+            } else {
+                semesterTitle.textContent = `SEMESTRE ${roman[i-1]}`;
+            }
+            
+            semesterColumn.appendChild(semesterTitle);
+            gridContainer.appendChild(semesterColumn);
+        }
+
+        // Crear cajas de ramos
+        courseData.forEach(course => {
+            let targetSemester = course.semester;
+            // Agrupar ramos del semestre 10 en la columna del 9
+            if (targetSemester === 10) targetSemester = 9;
+            
+            const semesterColumn = document.getElementById(`semester-${targetSemester}`);
+            
+            if(semesterColumn) {
+                const courseBox = document.createElement('div');
+                courseBox.classList.add('course-box');
+                courseBox.id = `course-${course.code}`;
+                courseBox.dataset.code = course.code;
+
+                const courseName = document.createElement('span');
+                courseName.classList.add('course-name');
+                courseName.textContent = course.name;
+
+                const courseCode = document.createElement('span');
+                courseCode.classList.add('course-code');
+                courseCode.textContent = `Código: ${course.code}`;
+
+                courseBox.appendChild(courseName);
+                courseBox.appendChild(courseCode);
+                semesterColumn.appendChild(courseBox);
+
+                // Agregar el evento de clic
+                courseBox.addEventListener('click', () => handleCourseClick(course.code));
+            }
+        });
+
+        updateAllCourseStates();
+    }
+
+    // Función que se ejecuta al hacer clic en un ramo
+    function handleCourseClick(courseCode) {
+        const courseBox = document.getElementById(`course-${courseCode}`);
+        if (courseBox.classList.contains('locked')) {
+            // No hacer nada si el ramo está bloqueado
+            return;
+        }
+
+        const index = passedCourses.indexOf(courseCode);
+        if (index > -1) {
+            // Si ya está aprobado, quitarlo (para corregir errores)
+            passedCourses.splice(index, 1);
         } else {
-            semesterTitle.textContent = `SEMESTRE ${roman[i-1]}`;
+            // Si no está aprobado, agregarlo a la lista
+            passedCourses.push(courseCode);
         }
-        
-        semesterColumn.appendChild(semesterTitle);
-        gridContainer.appendChild(semesterColumn);
+
+        // Guardar el progreso en el almacenamiento local
+        localStorage.setItem('passedCourses_kine', JSON.stringify(passedCourses));
+        // Actualizar el estado visual de todos los ramos
+        updateAllCourseStates();
     }
-    
-    // Posicionar los internados en la columna 9
-    const semester9Column = document.getElementById('semester-9');
-    const internado1 = courseData.find(c => c.code === "72045");
-    const internado2 = courseData.find(c => c.code === "75046");
-    const internado3 = courseData.find(c => c.code === "75047");
-    internado1.semester = 9;
-    internado2.semester = 9;
-    internado3.semester = 9;
-    
-    // Posicionar la certificación en la columna 10, que es la 9 visualmente
-    const cert = courseData.find(c => c.code === "72048");
-    cert.semester = 9; // Visualmente en la misma columna de internados
 
-    // Crear cajas de ramos
-    courseData.forEach(course => {
-        let targetSemester = course.semester;
-        if (targetSemester === 10) targetSemester = 9; // Mover al 9
-        
-        const semesterColumn = document.getElementById(`semester-${targetSemester}`);
-        
-        if(semesterColumn) {
-            const courseBox = document.createElement('div');
-            courseBox.classList.add('course-box');
-            courseBox.id = `course-${course.code}`;
-            courseBox.dataset.code = course.code;
+    // Función para actualizar el estado visual (bloqueado, disponible, aprobado) de todos los ramos
+    function updateAllCourseStates() {
+        courseData.forEach(course => {
+            const courseBox = document.getElementById(`course-${course.code}`);
+            if (!courseBox) return;
 
-            const courseName = document.createElement('span');
-            courseName.classList.add('course-name');
-            courseName.textContent = course.name;
+            // Limpiar clases de estado anteriores
+            courseBox.classList.remove('passed', 'available', 'locked');
 
-            const courseCode = document.createElement('span');
-            courseCode.classList.add('course-code');
-            courseCode.textContent = `Código: ${course.code}`;
-
-            courseBox.appendChild(courseName);
-            courseBox.appendChild(courseCode);
-            semesterColumn.appendChild(courseBox);
-        }
-    });
-
-    const allCourseBoxes = document.querySelectorAll('.course-box');
-
-    // Lógica de interactividad
-    allCourseBoxes.forEach(box => {
-        box.addEventListener('mouseenter', () => {
-            const currentCode = box.dataset.code;
-            const coursesToUnlock = courseData.filter(c => c.prereqs.includes(currentCode));
-            const prereqCourses = courseData.find(c => c.code === currentCode).prereqs;
-
-            allCourseBoxes.forEach(b => b.classList.add('dimmed'));
-            box.classList.remove('dimmed');
-            
-            // Highlight de ramos que desbloquea
-            coursesToUnlock.forEach(unlockedCourse => {
-                const unlockedBox = document.getElementById(`course-${unlockedCourse.code}`);
-                if (unlockedBox) {
-                    unlockedBox.classList.remove('dimmed');
-                    unlockedBox.classList.add('highlight-unlocks');
-                    drawArrow(box, unlockedBox);
+            if (passedCourses.includes(course.code)) {
+                // 1. El ramo está APROBADO
+                courseBox.classList.add('passed');
+            } else {
+                // Verificar si los prerrequisitos están cumplidos
+                const prereqsMet = course.prereqs.every(prereqCode => passedCourses.includes(prereqCode));
+                
+                if (prereqsMet) {
+                    // 2. El ramo está DISPONIBLE para ser cursado
+                    courseBox.classList.add('available');
+                } else {
+                    // 3. El ramo está BLOQUEADO
+                    courseBox.classList.add('locked');
                 }
-            });
-            
-            // Highlight de prerrequisitos
-             prereqCourses.forEach(prereqCode => {
-                const prereqBox = document.getElementById(`course-${prereqCode}`);
-                if(prereqBox) {
-                    prereqBox.classList.remove('dimmed');
-                    prereqBox.classList.add('highlight-prereq');
-                }
-            });
-
+            }
         });
-
-        box.addEventListener('mouseleave', () => {
-            allCourseBoxes.forEach(b => {
-                b.classList.remove('dimmed', 'highlight-unlocks', 'highlight-prereq');
-            });
-            clearArrows();
-        });
-    });
-
-    function drawArrow(startElem, endElem) {
-        const rect1 = startElem.getBoundingClientRect();
-        const rect2 = endElem.getBoundingClientRect();
-        const containerRect = svgContainer.getBoundingClientRect();
-
-        const x1 = rect1.left + rect1.width / 2 - containerRect.left;
-        const y1 = rect1.top + rect1.height / 2 - containerRect.top;
-        const x2 = rect2.left + rect2.width / 2 - containerRect.left;
-        const y2 = rect2.top + rect2.height / 2 - containerRect.top;
-
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x1);
-        line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2);
-        line.setAttribute('y2', y2);
-        line.classList.add('visible');
-        svgContainer.appendChild(line);
     }
 
-    function clearArrows() {
-        svgContainer.innerHTML = '';
-    }
+    // Iniciar la aplicación
+    initializeGrid();
+});
 });
