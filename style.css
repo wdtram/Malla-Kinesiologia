@@ -154,4 +154,19 @@ main {
     border: 1px solid #ccc;
 }
 
-.legend-item .box-color.available { background-color: #fff; border-left: 5px solid var
+.legend-item .box-color.available { background-color: #fff; border-left: 5px solid var(--color-secondary); }
+.legend-item .box-color.passed { background-color: #e9d8fd; border-left: 5px solid #c3aed6; }
+.legend-item .box-color.locked { background-color: #f8f9fa; border-left: 5px solid var(--color-locked); }
+
+.love-message {
+    color: #e91e63; /* Un color rosado bonito */
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+footer {
+    margin-top: 40px;
+    font-size: 0.9em;
+    color: #777;
+}
