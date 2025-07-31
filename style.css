@@ -1,7 +1,6 @@
 :root {
     --color-main: #003366;
-    --color-secondary: #00a0e1;
-    --color-passed: #28a745;
+    --color-secondary: #a7c7e7; /* Celeste pastel para los bordes y títulos */
     --color-locked: #6c757d;
     --color-text: #333;
     --color-light-text: #fff;
@@ -121,8 +120,8 @@ main {
 }
 
 .course-box.passed {
-    border-left: 5px solid var(--color-passed);
-    background-color: #d4edda;
+    border-left: 5px solid #c3aed6; /* Borde morado pastel */
+    background-color: #e9d8fd; /* Fondo morado clarito */
     opacity: 0.8;
     text-decoration: line-through;
     cursor: pointer;
@@ -155,19 +154,4 @@ main {
     border: 1px solid #ccc;
 }
 
-.legend-item .box-color.available { background-color: #fff; border-left: 5px solid var(--color-secondary); }
-.legend-item .box-color.passed { background-color: #d4edda; border-left: 5px solid var(--color-passed); }
-.legend-item .box-color.locked { background-color: #f8f9fa; border-left: 5px solid var(--color-locked); }
-
-
-footer {
-    margin-top: 40px;
-    font-size: 0.9em;
-    color: #777;
-}
-.love-message {
-    color: #e91e63; /* Un color rosado bonito */
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 15px;
-}
+.legend-item .box-color.available { background-color: #fff; border-left: 5px solid var
