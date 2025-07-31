@@ -9,18 +9,22 @@
 </head>
 <body>
     <header>
-        <h1>Malla Curricular Interactiva</h1>
+        <h1>Seguimiento Malla Curricular</h1>
         <h2>Kinesiología - Universidad Central de Chile</h2>
-        <p>Pasa el mouse sobre un ramo para ver qué asignaturas desbloquea.</p>
+        <p>Haz clic en un ramo para marcarlo como aprobado. Los ramos futuros se desbloquearán automáticamente.</p>
     </header>
     <main>
         <div id="malla-container">
-            <svg id="arrow-container"></svg>
             <div id="grid-container"></div>
+        </div>
+        <div class="legend">
+            <div class="legend-item"><span class="box-color available"></span> Ramo Disponible</div>
+            <div class="legend-item"><span class="box-color passed"></span> Ramo Aprobado</div>
+            <div class="legend-item"><span class="box-color locked"></span> Ramo Bloqueado</div>
         </div>
     </main>
     <footer>
-        <p>Creado con ❤️. Basado en la malla curricular de Kinesiología (Resolución N°5658, 2020) de la Universidad Central de Chile.</p>
+        <p>Creado con ❤️. El progreso se guarda localmente en tu navegador.</p>
     </footer>
     <script src="script.js"></script>
 </body>
